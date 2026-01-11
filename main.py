@@ -77,9 +77,7 @@ SYSTEM_PROMPT = """
 ... (以此类推，处理完批次内的所有邮件)
 
 # 特别说明
-- 社团邮件标记：如果邮件内容是关于社团活动，请在主题末尾添加 `[社团邮件]`。
-- 志愿者招募标记：如果邮件内容是关于志愿者招募（volunteer recruitment），请在主题末尾添加 `[志愿者招募]`。
-- 文献alert识别关键词：ScienceDirect、Alert、New Articles、期刊更新、新论文、Available Online等。
+- 文献alert识别关键词：Web of Science Alert、Google Scholar Alerts、ScienceDirect、Google学术、Alert、New Articles、期刊更新、新论文、Available Online等。
 
 # 待分析的邮件数据
 {{emails}}
@@ -188,7 +186,7 @@ def get_emails_from_target_date(target_date):
                 body = ""
                 body_html = ""
                 if msg.is_multipart():
-                    for part in msg.walk():
+                    for part 在 msg.walk():
                         content_type = part.get_content_type()
                         if content_type == "text/html" and not body_html:
                             try:
