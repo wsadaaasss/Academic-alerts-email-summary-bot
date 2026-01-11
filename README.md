@@ -4,24 +4,7 @@
 
 得到的文献汇总示例如下：
 
-邮件 1：Aerospace Science and Technology: Alert 10 January
-发件人：ScienceDirect Message Center sciencedirect@notification.elsevier.com
-摘要： 期刊《Aerospace Science and Technology》新增7篇论文：
-
-Soot formation characteristics of the RP-3 aviation kerosene/ oxygen laminar premixed flame under certain fuel-rich combustion 作者：Shuqing Fu, Wen Zeng, Qingjun Zhao, Wei Zhao, Long Hao, Bin Hu 发表日期：10 January 2026 类型：Research article
-
-Mechanism of coupled energy transfer and pressure drop in cryogenic propellant sloshing through improved phase change modeling 作者：Jian Yang, Yanzhong Li, Lei Wang, Fushou Xie, Cui Li 发表日期：10 January 2026 类型：Research article
-
-Nonlinear flutter of tandem curved panels subject to supersonic flows 作者：Naitian Hu, Hao Liu, Penglin Gao, Hao Gao, Yegao Qu, Guang Meng 发表日期：10 January 2026 类型：Research article
-
-Multidisciplinary Design Analysis and Optimization of Aero-assisted Orbital Transfer Vehicle 作者：Jiliang Xiao, Zhaoyan Lu, Shuanghou Deng, Tianhang Xiao, Dong Han 发表日期：09 January 2026 类型：Research article
-
-A data-driven airfoil generative design method and its application in compressor throughflow optimization design 作者：Shuaipeng Liu, Shaojuan Geng, Hongwu Zhang 发表日期：09 January 2026 类型：Research article
-
-Toward High-Efficiency Design for Jet-Based Flow Control in High-Pressure Turbine Vanes 作者：Yulei Chen, Weihao Zhang, Yufan Wang, Dongming Huang, Xin Li, Lei Wang 发表日期：09 January 2026 类型：Research article
-
-Cooling efficiency and non-reactive flow characteristics of a tail-cavity air-cooled flameholder 作者：YUANZI WU, GUANGHAI LIU, YUYING LIU 发表日期：09 January 2026 类型：Research article
-
+<img width="2122" height="1474" alt="image" src="https://github.com/user-attachments/assets/213cd2be-77f5-49ce-b8c7-3becaa8a9f88" />
 
 
 # 个人AI邮件总结助手 (Email Summary Bot)
