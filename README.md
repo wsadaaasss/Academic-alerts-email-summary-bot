@@ -1,4 +1,4 @@
-原作者Li Ruisen（https://github.com/Leeboom7）
+原作者https://github.com/Leeboom7/email-summary-bot
 
 本人在原作者项目的基础上进行了修改，其核心目标是实现对 Google 学术、Web of Science、ScienceDirect 等学术平台的每日订阅邮件进行总结，这些邮件是依据我们所设置的关键词或者关注的作者来推送相关文献的。现有开源项目主要针对arXiv预发表网站进行跟踪总结，航空航天相关arXiv使用较少，故对原项目进行修改以满足自身学习科研使用。
 
