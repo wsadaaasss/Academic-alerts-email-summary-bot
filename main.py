@@ -15,6 +15,7 @@ from email.header import Header
 import openai
 import json
 import markdown2
+import re
 
 # ==============================================================================
 # 全局常量与配置
@@ -101,6 +102,37 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
 # 核心功能函数
 # ==============================================================================
 
+def extract_text_from_html(html_content):
+    """
+    从HTML内容中提取纯文本，保留论文列表的结构。
+    """
+    if not html_content:
+        return ""
+    
+    # 移除HTML标签，但保留文本内容
+    text = re.sub(r'<[^>]+>', '\n', html_content)
+    
+    # 移除多余的空白行
+    text = re.sub(r'\n\s*\n', '\n\n', text)
+    
+    # 移除HTML实体
+    html_entities = {
+        '&nbsp;': ' ',
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'"
+    }
+    for entity, char in html_entities.items():
+        text = text.replace(entity, char)
+    
+    # 清理每行前后的空格
+    lines = [line.strip() for line in text.split('\n')]
+    text = '\n'.join(lines)
+    
+    return text.strip()
+
 def get_emails_from_target_date(target_date):
     """
     通过IMAP连接到邮箱，获取指定日期的邮件。
@@ -154,27 +186,54 @@ def get_emails_from_target_date(target_date):
                     from_ = from_.decode(encoding if encoding else "utf-8", errors='ignore')
 
                 body = ""
+                body_html = ""
                 if msg.is_multipart():
                     for part in msg.walk():
-                        if part.get_content_type() == "text/plain":
+                        content_type = part.get_content_type()
+                        if content_type == "text/html" and not body_html:
+                            try:
+                                body_bytes = part.get_payload(decode=True)
+                                try: body_html = body_bytes.decode('utf-8')
+                                except UnicodeDecodeError:
+                                    try: body_html = body_bytes.decode('gbk')
+                                    except UnicodeDecodeError: body_html = body_bytes.decode('utf-8', errors='ignore')
+                            except: continue
+                        elif content_type == "text/plain" and not body:
                             try:
                                 body_bytes = part.get_payload(decode=True)
                                 try: body = body_bytes.decode('utf-8')
                                 except UnicodeDecodeError:
                                     try: body = body_bytes.decode('gbk')
                                     except UnicodeDecodeError: body = body_bytes.decode('utf-8', errors='ignore')
-                                break
                             except: continue
                 else:
+                    content_type = msg.get_content_type()
                     try:
                         body_bytes = msg.get_payload(decode=True)
-                        try: body = body_bytes.decode('utf-8')
+                        try: 
+                            if content_type == "text/html":
+                                body_html = body_bytes.decode('utf-8')
+                            else:
+                                body = body_bytes.decode('utf-8')
                         except UnicodeDecodeError:
-                            try: body = body_bytes.decode('gbk')
-                            except UnicodeDecodeError: body = body_bytes.decode('utf-8', errors='ignore')
+                            try: 
+                                if content_type == "text/html":
+                                    body_html = body_bytes.decode('gbk')
+                                else:
+                                    body = body_bytes.decode('gbk')
+                            except UnicodeDecodeError:
+                                if content_type == "text/html":
+                                    body_html = body_bytes.decode('utf-8', errors='ignore')
+                                else:
+                                    body = body_bytes.decode('utf-8', errors='ignore')
                     except: body = "无法解码正文。"
                 
-                mail_list.append({ "from_sender": from_, "subject": subject, "body_preview": body[:1500] })
+                # 如果有HTML内容，优先使用HTML提取的文本
+                if body_html:
+                    body = extract_text_from_html(body_html)
+                
+                # 增加预览长度到10000字符，以便包含完整的文献列表
+                mail_list.append({ "from_sender": from_, "subject": subject, "body_preview": body[:10000] })
             except Exception as e:
                 print(f"解析邮件 {email_id.decode()} 时出错: {e}")
                 continue
