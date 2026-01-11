@@ -186,7 +186,7 @@ def get_emails_from_target_date(target_date):
                 body = ""
                 body_html = ""
                 if msg.is_multipart():
-                    for part 在 msg.walk():
+                    for part in msg.walk():
                         content_type = part.get_content_type()
                         if content_type == "text/html" and not body_html:
                             try:
