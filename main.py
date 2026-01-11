@@ -49,7 +49,7 @@ SYSTEM_PROMPT = """
 - **发件人**：[发件人信息]
 - **摘要**：
   [如果是文献alert，按以下格式]
-  期刊《Aerospace Science and Technology》新增15篇论文：
+  期刊《Aerospace Science and Technology》新增20篇论文：
   
   1. A Hybrid Deep Learning Framework for Efficient Airfoil Design Optimization
      作者：Abdurrahman Tekin, Tianhang XIAO, Xiongqing YU
