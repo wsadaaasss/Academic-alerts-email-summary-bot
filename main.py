@@ -35,7 +35,7 @@ SYSTEM_PROMPT = """
 4. 严格按照"输出格式要求"生成内容。邮件序号**必须从 {{start_index}} 开始**。
 
 # 文献Alert邮件特殊处理
-如果邮件是文献alert（如ScienceDirect、期刊更新、新论文提醒等），在"摘要"部分必须：
+如果邮件是文献alert（如关注期刊更新、关注特定主题的检索、关注作者最新相关工作、被关注作者或文章的最新引用等），在"摘要"部分必须：
 1. 首行说明期刊名称和alert类型
 2. 逐条列出每篇论文的详细信息，格式如下：
    - 论文标题
@@ -47,7 +47,7 @@ SYSTEM_PROMPT = """
 #### 邮件 {{start_index}}：[第一封邮件的主题]
 - **发件人**：[发件人信息]
 - **摘要**：
-  [如果是文献alert，按以下格式]
+  [如果是期刊新增alert，按以下格式]
   期刊《Aerospace Science and Technology》新增20篇论文：
   
   1. A Hybrid Deep Learning Framework for Efficient Airfoil Design Optimization
@@ -70,8 +70,23 @@ SYSTEM_PROMPT = """
 #### 邮件 {{start_index + 1}}：[第二封邮件的主题]
 - **发件人**：[发件人信息]
 - **摘要**：[简洁概括]
----
-... (以此类推，处理完批次内的所有邮件)
+[如果是所关注特定主题的检索、关注作者最新相关工作、被关注作者或文章的最新引用alert，也按以下格式详细列出文章名、作者名]
+
+ 1. A Hybrid Deep Learning Framework for Efficient Airfoil Design Optimization
+     作者：Abdurrahman Tekin, Tianhang XIAO, Xiongqing YU
+     发表日期：11 January 2026
+     类型：Research article
+  
+  2. Noise reduction mechanisms of brush-like trailing-edge extensions on a stalled airfoil
+     作者：Zhi Deng, Yong Wang, Zifeng Yang, Donglai Gao, Wen-Li Chen
+     发表日期：10 January 2026
+     类型：Research article
+     
+# 如果不是文献alert，总结后概括
+- **摘要**：[简洁概括] 
+
+
+... (以此类推，涉及到论文均按上述标准详细列出文章名、作者等信息直到处理完批次内的所有邮件)
 
 # 特别说明
 - 文献alert识别关键词：Web of Science Alert、Google Scholar Alerts、ScienceDirect、Google学术、Alert、New Articles、期刊更新、新论文、Available Online等。
