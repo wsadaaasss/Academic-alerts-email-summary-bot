@@ -2,7 +2,7 @@
 
 name: Daily Email Summary
 
-on:
+于:
   workflow_dispatch: # 允许手动触发
   schedule:
     # 每天UTC时间16:15（即北京时间第二天凌晨00:15）运行，以总结前一天的邮件
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
