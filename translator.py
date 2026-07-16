@@ -1,12 +1,19 @@
 """
 translator.py
 ================================================================================
-中英文逐行对照翻译模块。
+中英文逐行对照翻译模块（v1.2 标记为可选）。
 
 调用 deepseek-v4-pro 对每封邮件的正文（含主题）进行双语翻译，
 输出"原文 / 译文"交替排列的格式，便于快速比对阅读。
 
-★ 长邮件分块机制：
+★ v1.2 变更：
+  默认行为已变更为"内联翻译"（在摘要阶段同时输出中文），
+  本模块仅在 ENABLE_SEPARATE_TRANSLATION=true 时运行。
+  速度对比：24 封邮件独立翻译需 50+ 次 API 调用（约 20 分钟），
+  改为内联后只需 5 次调用（约 3 分钟）。除非有特殊需求，
+  建议使用默认的内联翻译。
+
+★ 长邮件分块机制（保留作为兜底）：
   Web of Science 单期推送可达 50+ 篇论文（~80K 字符），翻译输出量
   约为输入量的 2 倍（原文+译文逐行）。本模块将超长邮件自动拆分为
   token 预算内的分块，逐块翻译后拼接，确保不超出 128K 上下文窗口。
@@ -155,12 +162,13 @@ def translate_emails(
 ) -> str:
     """
     对邮件列表逐封翻译，返回完整双语对照报告。
+    v1.2: 仅在 cfg.enable_separate_translation=True 时调用。
     """
-    if not cfg.enable_translation or not emails:
+    if not cfg.enable_separate_translation or not emails:
         return ""
 
     total = len(emails)
-    print(f"[Pipeline] 开始双语翻译: {total} 封邮件")
+    print(f"[Pipeline] 独立翻译模式: {total} 封邮件")
 
     parts = [
         "\n\n---\n\n"

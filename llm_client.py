@@ -20,7 +20,11 @@ from typing import List, Dict, Optional
 import openai
 
 from config import Config
-from prompts import render_prompt, SUMMARY_SYSTEM_PROMPT
+from prompts import (
+    render_prompt,
+    SUMMARY_SYSTEM_PROMPT,
+    SUMMARY_WITH_TRANSLATION_PROMPT,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -239,9 +243,17 @@ class LLMClient:
     # ──────────────────────────────────────────────────────────────────────────
     # 摘要流水线
     # ──────────────────────────────────────────────────────────────────────────
-    def summarize_emails(self, emails: List[Dict]) -> str:
+    def summarize_emails(
+        self,
+        emails: List[Dict],
+        with_translation: bool = False,
+    ) -> str:
         """
         对邮件列表进行分批摘要，返回完整 Markdown 报告。
+
+        Args:
+            emails: 邮件列表
+            with_translation: 是否使用内联双语摘要提示词（v1.2 默认）
         """
         if not emails:
             return (
@@ -249,14 +261,21 @@ class LLMClient:
                 "**总览：共 0 封邮件**\n\n---\n\n今日没有收到新邮件。"
             )
 
-        total = len(emails)
-        batches = self.compute_dynamic_batches(emails, SUMMARY_SYSTEM_PROMPT)
+        # 根据是否启用翻译选择提示词
+        prompt_template = (
+            SUMMARY_WITH_TRANSLATION_PROMPT if with_translation
+            else SUMMARY_SYSTEM_PROMPT
+        )
 
+        total = len(emails)
+        batches = self.compute_dynamic_batches(emails, prompt_template)
+
+        mode_tag = "（中英双语）" if with_translation else ""
         report_parts = [
-            f"### 每日邮件汇总\n**总览：共 {total} 封邮件**\n\n---"
+            f"### 每日邮件汇总\n**总览：共 {total} 封邮件{mode_tag}**\n\n---"
         ]
 
-        print(f"[Pipeline] 开始分批摘要: {total} 封邮件 → {len(batches)} 批")
+        print(f"[Pipeline] 开始分批摘要{mode_tag}: {total} 封邮件 → {len(batches)} 批")
 
         processed = 0
         for batch_idx, batch in enumerate(batches):
@@ -269,12 +288,13 @@ class LLMClient:
 
             emails_json = json.dumps(batch, ensure_ascii=False, indent=2)
             prompt = render_prompt(
-                SUMMARY_SYSTEM_PROMPT,
+                prompt_template,
                 emails=emails_json,
                 start_index=start_index,
             )
 
-            result = self.chat(prompt)
+            # 摘要输出使用更充足的 max_tokens（中文摘要会增加输出量）
+            result = self.chat(prompt, max_tokens=self._cfg.summary_max_output_tokens)
             if result:
                 report_parts.append(result)
             else:

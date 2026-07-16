@@ -9,7 +9,7 @@
 
 # 个人AI邮件总结助手 (Email Summary Bot)
 
-> **v1.1** — 模块化架构重构 + deepseek-v4-pro 迁移 + 双语对照翻译
+> **v1.2** — 内联双语翻译优化（API 调用次数减少 90%，运行时间缩短 80%）
 
 这是一个基于 GitHub Actions 的自动化工具，它能每日定时读取你指定的邮箱文件夹，使用 **DeepSeek** 的 `deepseek-v4-pro` 语言模型进行智能总结，并将一份邮件汇总报告发送到你的另一个邮箱。
 
@@ -22,7 +22,7 @@
 - **无需服务器**：你不需要购买或维护任何服务器。
 - **模块化架构** (v1.1)：代码拆分为配置、邮件获取、LLM 客户端、翻译、通知五个解耦模块。
 - **上下文智能管理** (v1.1)：动态 token 估算 + 动态批处理，精准适配 128K 上下文窗口。
-- **双语对照翻译** (v1.1)：逐行中英文互译，原文译文交替呈现，支持快速比对阅读。
+- **内联双语翻译** (v1.2)：在摘要阶段同时输出原文与中文摘要，单次 API 调用完成双语输出，运行时间缩短 80%。
 
 ## 📁 项目结构
 
@@ -30,10 +30,10 @@
 Academic-alerts-email-summary-bot/
 ├── main.py              # 流水线入口（5阶段标准化流程）
 ├── config.py            # 集中式配置管理
-├── prompts.py           # 提示词模板（摘要 + 翻译）
+├── prompts.py           # 提示词模板（内联双语摘要 + 兼容旧版）
 ├── email_fetcher.py     # IMAP 邮件获取 + HTML 解析
 ├── llm_client.py        # DeepSeek 客户端封装（重试 + 动态批处理 + token 估算）
-├── translator.py        # 中英文逐行对照翻译（长邮件自动分块）
+├── translator.py        # 独立翻译模块（v1.2 标记为可选，默认关闭）
 ├── notifier.py          # SMTP 邮件发送
 ├── find_folders.py      # 邮箱文件夹查找工具
 ├── .github/workflows/
@@ -42,15 +42,24 @@ Academic-alerts-email-summary-bot/
 └── requirements.txt     # Python 依赖
 ```
 
-## 🔄 流水线阶段
+## 🔄 流水线阶段（v1.2）
 
 ```
-① Config.from_env()         →  加载 & 校验配置
-② fetch_emails_by_date()    →  IMAP 拉取目标日期邮件
-③ llm.summarize_emails()    →  deepseek-v4-pro 分批摘要（动态批次）
-④ translate_emails()        →  deepseek-v4-pro 逐封双语翻译（可关闭）
-⑤ send_report()            →  SMTP 发送合并报告
+① Config.from_env()                 →  加载 & 校验配置
+② fetch_emails_by_date()            →  IMAP 拉取目标日期邮件
+③ llm.summarize_emails()            →  deepseek-v4-pro 分批摘要（默认含中文）
+                                       论文条目下直接附中文摘要，单次 API 调用输出双语
+④ translate_emails()                →  独立翻译模块（可选，默认关闭）
+                                       仅当 ENABLE_SEPARATE_TRANSLATION=true 时运行
+⑤ send_report()                    →  SMTP 发送合并报告
 ```
+
+**v1.2 性能对比**（24 封邮件 + 1 封 WoS 50+ 篇）：
+
+| 模式 | API 调用次数 | 预估运行时间 |
+|------|-------------|-------------|
+| v1.1 摘要 + 独立翻译 | ~55 次 | ~25 分钟 |
+| **v1.2 内联翻译（默认）** | **5 次** | **~5 分钟** |
 
 ## 🚀 配置步骤
 
@@ -118,11 +127,30 @@ Academic-alerts-email-summary-bot/
 | `DEEPSEEK_MODEL` | `deepseek-v4-pro` | DeepSeek 模型名 |
 | `MAX_BODY_CHARS` | `80000` | 邮件正文最大保留字符数 |
 | `SUMMARY_BATCH_SIZE` | `5` | 摘要批次大小上限 |
-| `ENABLE_TRANSLATION` | `true` | 是否生成双语对照翻译（设为 `false` 关闭） |
+| `ENABLE_TRANSLATION` | `true` | v1.2: 是否在摘要中输出中文（设为 `false` 则纯英文摘要） |
+| `ENABLE_SEPARATE_TRANSLATION` | `false` | v1.2: 是否额外运行独立翻译模块（会增加 API 调用次数） |
 
 ---
 
 ## 📋 变更日志
+
+### v1.2 (2026-07-16)
+
+#### 性能优化
+- **内联双语翻译**：将翻译集成到摘要阶段，单次 API 调用同时输出论文原文与中文摘要
+  - API 调用次数：~55 次（v1.1）→ **5 次（v1.2）**，减少 90%+
+  - 整体运行时间：~25 分钟（v1.1）→ **~5 分钟（v1.2）**，缩短 80%
+  - 输出格式：每篇论文下直接附"中文摘要"行，类似网页双语对照阅读体验
+- **`summary_max_output_tokens` 提升至 16,384**：摘要现在包含中文内容，输出量增加
+
+#### 行为变更（非破坏性）
+- **`ENABLE_TRANSLATION` 语义调整**：从"是否运行独立翻译模块"变为"是否在摘要中输出中文"，默认仍为 `true`
+- **新增 `ENABLE_SEPARATE_TRANSLATION`**：控制是否额外运行 v1.1 风格的独立翻译模块，默认 `false`
+- **独立翻译模块保留**：可通过 `ENABLE_SEPARATE_TRANSLATION=true` 启用（适用于特殊场景）
+
+#### 输出格式变化
+- 摘要现在包含"中文主题"和"中文摘要"字段
+- 文献 Alert 邮件每篇论文下新增"**中文摘要**："行（1-2 句中文概括研究方法/主要发现）
 
 ### v1.1 (2026-07-16)
 
