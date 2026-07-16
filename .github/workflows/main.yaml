@@ -31,10 +31,14 @@ jobs:
           IMAP_SERVER: ${{ secrets.IMAP_SERVER }}
           IMAP_PORT: ${{ secrets.IMAP_PORT }}
           TARGET_FOLDER: ${{ secrets.TARGET_FOLDER }}
-          
-          # 用于调用DeepSeek
+
+          # 用于调用DeepSeek（deepseek-v4-pro）
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          
+          # 可选：覆盖默认模型（默认 deepseek-v4-pro）
+          DEEPSEEK_MODEL: deepseek-v4-pro
+          # 可选：关闭双语翻译功能（设为 false 则跳过阶段④）
+          ENABLE_TRANSLATION: 'true'
+
           # 用于发送邮件
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           SENDER_AUTH_CODE: ${{ secrets.SENDER_AUTH_CODE }}
