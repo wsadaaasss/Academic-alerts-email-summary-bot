@@ -4,7 +4,7 @@ config.py
 集中式配置管理模块。
 
 将原 main.py 中散落在顶层的 os.environ.get() 调用统一收敛为单一数据源，
-并显式声明 deepseek-v4-pro 模型相关的运行时参数（上下文长度、输出上限、
+并显式声明 deepseek-v4-flash 模型相关的运行时参数（上下文长度、输出上限、
 重试策略、温度等），使模型特性对调用方透明、可配置、可追溯。
 """
 
@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# deepseek-v4-pro 模型常量
+# deepseek-v4-flash 模型常量
 # ──────────────────────────────────────────────────────────────────────────────
 MODEL_CONTEXT_WINDOW = 131_072
 # 为系统提示词与输出预留的安全余量
@@ -43,7 +43,7 @@ class Config:
 
     # ── DeepSeek API ──
     deepseek_api_key: str = ""
-    deepseek_model: str = "deepseek-v4-pro"
+    deepseek_model: str = "deepseek-v4-flash"
     deepseek_base_url: str = "https://api.deepseek.com/v1"
     max_context_tokens: int = MODEL_CONTEXT_WINDOW
     summary_max_output_tokens: int = DEFAULT_SUMMARY_MAX_OUTPUT_TOKENS
@@ -90,7 +90,7 @@ class Config:
             smtp_server=os.environ.get("SMTP_SERVER", ""),
             smtp_port=int(os.environ.get("SMTP_PORT", 587)),
             # 可选运行时参数
-            deepseek_model=os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-pro"),
+            deepseek_model=os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash"),
             max_body_chars=int(os.environ.get("MAX_BODY_CHARS", 80_000)),
             summary_batch_size=int(os.environ.get("SUMMARY_BATCH_SIZE", 5)),
             enable_translation=os.environ.get("ENABLE_TRANSLATION", "true").lower()

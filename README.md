@@ -11,7 +11,7 @@
 
 > **v1.2** — 内联双语翻译优化（API 调用次数减少 90%，运行时间缩短 80%）
 
-这是一个基于 GitHub Actions 的自动化工具，它能每日定时读取你指定的邮箱文件夹，使用 **DeepSeek** 的 `deepseek-v4-pro` 语言模型进行智能总结，并将一份邮件汇总报告发送到你的另一个邮箱。
+这是一个基于 GitHub Actions 的自动化工具，它能每日定时读取你指定的邮箱文件夹，使用 **DeepSeek** 的 `deepseek-v4-flash` 语言模型进行智能总结，并将一份邮件汇总报告发送到你的另一个邮箱。
 
 ## ✨ 特点
 
@@ -47,7 +47,7 @@ Academic-alerts-email-summary-bot/
 ```
 ① Config.from_env()                 →  加载 & 校验配置
 ② fetch_emails_by_date()            →  IMAP 拉取目标日期邮件
-③ llm.summarize_emails()            →  deepseek-v4-pro 分批摘要（默认含中文）
+③ llm.summarize_emails()            →  deepseek-v4-flash 分批摘要（默认含中文）
                                        论文条目下直接附中文摘要，单次 API 调用输出双语
 ④ translate_emails()                →  独立翻译模块（可选，默认关闭）
                                        仅当 ENABLE_SEPARATE_TRANSLATION=true 时运行
@@ -124,7 +124,7 @@ Academic-alerts-email-summary-bot/
 
 | 变量名 | 默认值 | 说明 |
 |--------|--------|------|
-| `DEEPSEEK_MODEL` | `deepseek-v4-pro` | DeepSeek 模型名 |
+| `DEEPSEEK_MODEL` | `deepseek-v4-flash` | DeepSeek 模型名 |
 | `MAX_BODY_CHARS` | `80000` | 邮件正文最大保留字符数 |
 | `SUMMARY_BATCH_SIZE` | `5` | 摘要批次大小上限 |
 | `ENABLE_TRANSLATION` | `true` | v1.2: 是否在摘要中输出中文（设为 `false` 则纯英文摘要） |
@@ -155,10 +155,10 @@ Academic-alerts-email-summary-bot/
 ### v1.1 (2026-07-16)
 
 #### 破坏性变更
-- **模型迁移**：从 `deepseek-chat` 迁移至 `deepseek-v4-pro`（`deepseek-chat` 与 `deepseek-reasoner` 将于 2026/07/24 弃用）
+- **模型迁移**：从 `deepseek-chat` 迁移至 `deepseek-v4-flash`（`deepseek-chat` 与 `deepseek-reasoner` 将于 2026/07/24 弃用）
 
 #### 新功能
-- **双语对照翻译模块** (`translator.py`)：调用 deepseek-v4-pro 对每封邮件逐行中英文互译，原文与译文交替排列，支持快速双语阅读与信息比对
+- **双语对照翻译模块** (`translator.py`)：调用 deepseek-v4-flash 对每封邮件逐行中英文互译，原文与译文交替排列，支持快速双语阅读与信息比对
 - **长邮件分块翻译**：Web of Science 单期推送 50+ 篇论文时自动拆分为 token 预算内的分块，逐块翻译后拼接
 - **可配置环境变量**：新增 `DEEPSEEK_MODEL`、`MAX_BODY_CHARS`、`ENABLE_TRANSLATION` 等可选参数
 

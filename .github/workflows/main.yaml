@@ -35,7 +35,7 @@ jobs:
           # 用于调用DeepSeek（deepseek-v4-pro）
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           # 可选：覆盖默认模型（默认 deepseek-v4-pro）
-          DEEPSEEK_MODEL: deepseek-v4-pro
+          DEEPSEEK_MODEL: deepseek-v4-flash
           # v1.2: 是否在摘要中输出中文（默认 true，单次 API 调用同时输出原文+中文）
           ENABLE_TRANSLATION: 'true'
           # v1.2: 是否额外运行独立翻译模块（默认 false，启用后 API 调用次数大幅增加）

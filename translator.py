@@ -3,7 +3,7 @@ translator.py
 ================================================================================
 中英文逐行对照翻译模块（v1.2 标记为可选）。
 
-调用 deepseek-v4-pro 对每封邮件的正文（含主题）进行双语翻译，
+调用 deepseek-v4-flash 对每封邮件的正文（含主题）进行双语翻译，
 输出"原文 / 译文"交替排列的格式，便于快速比对阅读。
 
 ★ v1.2 变更：
@@ -29,7 +29,7 @@ from prompts import render_prompt, TRANSLATION_SYSTEM_PROMPT
 logger = logging.getLogger(__name__)
 
 
-# 翻译输出 token 上限（deepseek-v4-pro 输出量 ≈ 输入 × 2）
+# 翻译输出 token 上限（deepseek-v4-flash 输出量 ≈ 输入 × 2）
 TRANSLATION_MAX_OUTPUT_TOKENS = 32_768
 
 
@@ -109,7 +109,7 @@ def translate_single_email(
     """
     对单封邮件内容进行中英逐行对照翻译。
 
-    长邮件自动分块：每块独立调用 deepseek-v4-pro，结果按序拼接。
+    长邮件自动分块：每块独立调用 deepseek-v4-flash，结果按序拼接。
     """
     content = _prepare_email_content(mail)
 

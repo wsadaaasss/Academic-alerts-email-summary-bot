@@ -3,12 +3,12 @@ llm_client.py
 ================================================================================
 DeepSeek LLM 客户端封装层。
 
-针对 deepseek-v4-pro 模型特性做了以下规范化处理：
+针对 deepseek-v4-flash 模型特性做了以下规范化处理：
   1. 统一的客户端工厂（单例，避免重复创建）
   2. 指数退避重试机制（应对 429 / 5xx 等瞬时错误）
   3. Token 估算工具（用于上下文长度预算管理）
   4. 动态批处理：根据 token 预算自动裁剪每批邮件数量，
-     确保单次请求不会超出 deepseek-v4-pro 的 128K 上下文窗口
+     确保单次请求不会超出 deepseek-v4-flash 的 128K 上下文窗口
   5. 统一的错误返回格式
 """
 
@@ -36,7 +36,7 @@ def estimate_tokens(text: str) -> int:
     """
     粗略估算字符串的 token 数量。
 
-    deepseek-v4-pro 使用 BPE 分词器，经验值：
+    deepseek-v4-flash 使用 BPE 分词器，经验值：
       - 英文 ≈ 4 字符 / token
       - 中文 ≈ 1.5 字符 / token
       - 混合内容取中间值 ≈ 2.5 字符 / token
@@ -177,7 +177,7 @@ class LLMClient:
     ) -> List[List[Dict]]:
         """
         根据 token 预算动态计算批次大小，确保每批邮件 + 提示词
-        不会超出 deepseek-v4-pro 的有效输入预算。
+        不会超出 deepseek-v4-flash 的有效输入预算。
 
         逻辑：
           1. 估算模板自身（不含邮件数据）的 token 数
